@@ -10,7 +10,9 @@ build:
 deploy:
   helm:
     releases:
-      - name: my-release
+      - name: my-java-release
+        namespace: learn-java
+        createNamespace: true
         artifactOverrides:
           image: dxas90/learn
         chartPath: "./charts/learn"
