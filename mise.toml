@@ -1,0 +1,4 @@
+[tools]
+gradle = "8"
+java = "21"
+maven = "3"

@@ -1,0 +1,65 @@
+# Build stage
+FROM gradle:8.4-jdk21 AS builder
+
+WORKDIR /build
+
+# Copy dependency files first for better caching
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
+
+# Download dependencies
+RUN ./gradlew dependencies --no-daemon
+
+# Copy source code
+COPY src ./src
+
+# Build application
+RUN ./gradlew bootJar --no-daemon
+
+# Runtime stage
+FROM eclipse-temurin:21-jre-jammy AS production
+
+# Create non-root user
+RUN groupadd --gid 1001 appuser && \
+    useradd --uid 1001 --gid 1001 --create-home --shell /bin/bash appuser
+
+# Install security updates and curl for health checks
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set up application directory
+WORKDIR /app
+
+# Create logs directory
+RUN mkdir -p /app/logs && \
+    chown -R appuser:appuser /app
+
+# Copy application from builder stage
+COPY --from=builder --chown=appuser:appuser /build/build/libs/*.jar /app/app.jar
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Labels for better container management
+LABEL org.opencontainers.image.authors="Daniel Ramirez <dxas90@gmail.com>" \
+      org.opencontainers.image.description="Modern Spring Boot application for learning" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.source="https://github.com/dxas90/learn-java" \
+      org.opencontainers.image.title="Learn Java Spring Boot" \
+      org.opencontainers.image.version="2.0.0"
+
+# JVM optimization for containers
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"
+
+# Run application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
