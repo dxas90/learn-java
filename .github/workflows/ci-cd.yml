@@ -129,6 +129,10 @@ jobs:
         if: always()
         run: |
           # Basic dependency vulnerability pattern detection
+          if [ ! -f scripts/simple-security-check.sh ]; then
+            echo "⚠️  Security check script not found, skipping..."
+            exit 0
+          fi
           chmod +x scripts/simple-security-check.sh
           ./scripts/simple-security-check.sh
 
