@@ -25,9 +25,10 @@ FROM eclipse-temurin:21-jre-jammy AS production
 RUN groupadd --gid 1001 appuser && \
     useradd --uid 1001 --gid 1001 --create-home --shell /bin/bash appuser
 
-# Install security updates and clean up
+# Install security updates and curl for health checks, then clean up
 RUN apt-get update && \
     apt-get upgrade -y && \
+    apt-get install -y curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -47,8 +48,8 @@ COPY --from=builder --chown=appuser:appuser /build/application/ ./
 # Switch to non-root user
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+# Health check (give more time for Spring Boot startup)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Expose port
@@ -65,5 +66,5 @@ LABEL org.opencontainers.image.authors="Daniel Ramirez <dxas90@gmail.com>" \
 # JVM optimization for containers
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"
 
-# Run application
-ENTRYPOINT ["java", "-cp", ".:BOOT-INF/classes:BOOT-INF/lib/*", "com.learn.springboot.Application"]
+# Run application using Spring Boot JarLauncher
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
