@@ -1,116 +1,105 @@
 package com.learn.springboot;
 
+import com.learn.springboot.dto.HealthData;
+import com.learn.springboot.dto.SystemInfo;
+import com.learn.springboot.dto.WelcomeData;
+import com.learn.springboot.service.SystemInfoService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
-@Tag(name = "Hello API", description = "Simple greeting and health check operations")
+@Tag(name = "Learn Java API", description = "Main API endpoints matching Node.js structure")
 public class HelloController {
 
     private static final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
-    @Value("${app.name:Learn Java Spring Boot}")
-    private String appName;
+    @Value("${spring.application.name:learn-java}")
+    private String applicationName;
 
     @Value("${app.version:1.0.0}")
-    private String appVersion;
+    private String applicationVersion;
+
+    @Value("${spring.profiles.active:development}")
+    private String environment;
+
+    @Autowired
+    private SystemInfoService systemInfoService;
 
     @GetMapping("/")
-    @Operation(summary = "Get welcome message", description = "Returns a welcome message from the application")
+    @Operation(summary = "Get welcome message", description = "Returns welcome message with available endpoints")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved welcome message")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully retrieved welcome message")
     })
-    public ResponseEntity<WelcomeResponse> index() {
+    public ResponseEntity<com.learn.springboot.dto.ApiResponse<WelcomeData>> index() {
         logger.info("Welcome endpoint accessed");
-        WelcomeResponse response = new WelcomeResponse(
-                "Hello World from Spring Boot!",
-                appName,
-                appVersion,
-                LocalDateTime.now()
+
+        List<WelcomeData.EndpointInfo> endpoints = List.of(
+                new WelcomeData.EndpointInfo("/", "GET", "Welcome message with available endpoints"),
+                new WelcomeData.EndpointInfo("/ping", "GET", "Simple ping-pong response"),
+                new WelcomeData.EndpointInfo("/healthz", "GET", "Health check endpoint"),
+                new WelcomeData.EndpointInfo("/info", "GET", "Application information")
         );
+
+        WelcomeData welcomeData = new WelcomeData(
+                "Welcome to Learn Java API! 🚀",
+                applicationName,
+                applicationVersion,
+                environment,
+                endpoints
+        );
+
+        com.learn.springboot.dto.ApiResponse<WelcomeData> response = com.learn.springboot.dto.ApiResponse.success(welcomeData);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/ping")
     @Operation(summary = "Ping endpoint", description = "Simple ping-pong endpoint for connectivity testing")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pong response received")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Pong response received")
     })
-    public ResponseEntity<Map<String, Object>> ping() {
+    public ResponseEntity<String> ping() {
         logger.debug("Ping endpoint accessed");
-        return ResponseEntity.ok(Map.of(
-                "message", "pong",
-                "timestamp", LocalDateTime.now(),
-                "status", "healthy"
-        ));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("pong");
     }
 
-    @GetMapping("/health")
-    @Operation(summary = "Health check", description = "Returns application health status")
+    @GetMapping("/healthz")
+    @Operation(summary = "Health check", description = "Returns application health status with system metrics")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Application is healthy")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Application is healthy")
     })
-    public ResponseEntity<Map<String, Object>> health() {
+    public ResponseEntity<com.learn.springboot.dto.ApiResponse<HealthData>> healthz() {
         logger.debug("Health endpoint accessed");
-        return ResponseEntity.ok(Map.of(
-                "status", "UP",
-                "message", "Application is running smoothly",
-                "timestamp", LocalDateTime.now(),
-                "version", appVersion
-        ));
+
+        HealthData healthData = systemInfoService.getHealthData();
+        com.learn.springboot.dto.ApiResponse<HealthData> response = com.learn.springboot.dto.ApiResponse.success(healthData);
+
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/greet")
-    @Operation(summary = "Personalized greeting", description = "Returns a personalized greeting message")
+    @GetMapping("/info")
+    @Operation(summary = "Application information", description = "Returns detailed application and system information")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully created personalized greeting"),
-            @ApiResponse(responseCode = "400", description = "Invalid input provided")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully retrieved application information")
     })
-    public ResponseEntity<GreetingResponse> greet(@Valid @RequestBody GreetingRequest request) {
-        logger.info("Greeting requested for: {}", request.name());
+    public ResponseEntity<com.learn.springboot.dto.ApiResponse<SystemInfo>> info() {
+        logger.debug("Info endpoint accessed");
 
-        String message = String.format("Hello, %s! Welcome to %s", request.name(), appName);
-        GreetingResponse response = new GreetingResponse(
-                message,
-                request.name(),
-                LocalDateTime.now()
-        );
+        SystemInfo systemInfo = systemInfoService.getSystemInfo();
+        com.learn.springboot.dto.ApiResponse<SystemInfo> response = com.learn.springboot.dto.ApiResponse.success(systemInfo);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
-
-    // DTOs
-    public record WelcomeResponse(
-            String message,
-            String applicationName,
-            String version,
-            LocalDateTime timestamp
-    ) {}
-
-    public record GreetingRequest(
-            @NotBlank(message = "Name cannot be blank")
-            @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
-            String name
-    ) {}
-
-    public record GreetingResponse(
-            String message,
-            String name,
-            LocalDateTime timestamp
-    ) {}
 }

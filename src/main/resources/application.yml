@@ -4,16 +4,20 @@ spring:
   profiles:
     active: dev
 
+server:
+  port: 8080
+
 app:
-  name: "Learn Java Spring Boot"
+  name: "learn-java"
   version: "@project.version@"
-  description: "A learning project for Spring Boot with modern practices"
+  description: "A Java Spring Boot API learning project matching Node.js structure"
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
+      base-path: /actuator
   endpoint:
     health:
       show-details: when-authorized
@@ -24,7 +28,7 @@ management:
 logging:
   level:
     com.learn.springboot: INFO
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 

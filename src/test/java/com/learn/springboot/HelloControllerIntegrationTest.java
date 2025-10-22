@@ -24,27 +24,40 @@ class HelloControllerIntegrationTest {
     @Test
     void shouldReturnWelcomeMessage() {
         ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/", String.class);
+                .getForEntity("http://localhost:" + port + "/", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("Hello World from Spring Boot!");
+        assertThat(response.getBody()).contains("Welcome to Learn Java API");
+        assertThat(response.getBody()).contains("\"success\":true");
     }
 
     @Test
     void shouldReturnPongForPing() {
         ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/ping", String.class);
+                .getForEntity("http://localhost:" + port + "/ping", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("pong");
+        assertThat(response.getBody()).isEqualTo("pong");
     }
 
     @Test
     void shouldReturnHealthStatus() {
         ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/health", String.class);
+                .getForEntity("http://localhost:" + port + "/healthz", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("UP");
+        assertThat(response.getBody()).contains("\"success\":true");
+        assertThat(response.getBody()).contains("\"status\":\"healthy\"");
+    }
+
+    @Test
+    void shouldReturnSystemInfo() {
+        ResponseEntity<String> response = this.restTemplate
+                .getForEntity("http://localhost:" + port + "/info", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("\"success\":true");
+        assertThat(response.getBody()).contains("application");
+        assertThat(response.getBody()).contains("system");
     }
 }

@@ -1,7 +1,9 @@
 package com.learn.springboot.exception;
 
+import com.learn.springboot.dto.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,8 +20,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @Value("${spring.profiles.active:development}")
+    private String environment;
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {
 
         logger.warn("Validation error occurred: {}", ex.getMessage());
@@ -32,10 +36,9 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ApiResponse<Map<String, String>> errorResponse = ApiResponse.error(
                 "Validation failed",
                 HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
                 errors
         );
 
@@ -43,25 +46,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
+    public ResponseEntity<ApiResponse<Object>> handleGenericException(
             Exception ex, WebRequest request) {
 
         logger.error("Unexpected error occurred", ex);
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                "An unexpected error occurred",
+        // Only include details in non-production environments
+        Object details = null;
+        if (!"production".equals(environment)) {
+            details = Map.of("error", ex.getMessage());
+        }
+
+        ApiResponse<Object> errorResponse = ApiResponse.error(
+                "Internal Server Error",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now(),
-                Map.of("error", ex.getMessage())
+                details
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
-
-    public record ErrorResponse(
-            String message,
-            int status,
-            LocalDateTime timestamp,
-            Map<String, String> details
-    ) {}
 }
