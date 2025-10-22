@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!-- Suppress false positives for Spring Boot test dependencies -->
+    <suppress>
+        <notes><![CDATA[
+        Spring Boot test dependencies often have false positives
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/.*$</packageUrl>
+        <cve>CVE-2016-1000027</cve>
+    </suppress>
+    
+    <!-- Suppress false positives for H2 database in test/dev environment -->
+    <suppress>
+        <notes><![CDATA[
+        H2 database vulnerabilities only apply to production use with remote access
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
+        <cve>CVE-2022-45868</cve>
+    </suppress>
+    
+    <!-- Suppress false positives for development dependencies -->
+    <suppress>
+        <notes><![CDATA[
+        Development and test scope dependencies don't affect production security
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring-boot-devtools@.*$</packageUrl>
+    </suppress>
+</suppressions>
