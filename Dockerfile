@@ -5,17 +5,15 @@ WORKDIR /build
 
 # Copy dependency files first for better caching
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
+# Download dependencies using system Maven (more reliable in containers)
+RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
-# Build application
-RUN ./mvnw clean package -DskipTests -B
+# Build application using system Maven
+RUN mvn clean package -DskipTests -B
 
 # Extract layers for better Docker layer caching
 RUN java -Djarmode=layertools -jar target/*.jar extract
