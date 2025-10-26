@@ -1,4 +1,4 @@
-image: maven:3.9.4-eclipse-temurin-21
+image: maven:3.9.11-eclipse-temurin-21
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
