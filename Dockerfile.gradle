@@ -17,7 +17,7 @@ COPY src ./src
 RUN ./gradlew bootJar --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-jammy AS production
+FROM eclipse-temurin:25-jre-jammy AS production
 
 # Create non-root user
 RUN groupadd --gid 1001 appuser && \
