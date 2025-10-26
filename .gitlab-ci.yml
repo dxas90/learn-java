@@ -94,7 +94,7 @@ deploy:staging:
 # Kubernetes testing with KinD
 k8s:test:
   stage: test
-  image: dxas90/ci-tools:v0.0.1
+  image: dxas90/ci-tools:v0.0.2
   variables:
     KUBECTL: v1.28.0
     KIND: v0.20.0
