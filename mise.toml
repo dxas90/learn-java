@@ -1,4 +1,4 @@
 [tools]
 gradle = "8"
-java = "21"
+java = "21.0.9+10.0.LTS"
 maven = "3"
