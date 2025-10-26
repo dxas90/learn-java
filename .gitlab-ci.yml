@@ -6,7 +6,7 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
 
 services:
-  - docker:24-dind
+  - docker:28-dind
 
 stages:
   - validate
@@ -51,7 +51,7 @@ test:
 # Build application and Docker image
 build:
   stage: build
-  image: docker:24
+  image: docker:28
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
