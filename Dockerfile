@@ -19,7 +19,7 @@ RUN mvn clean package -DskipTests -B
 RUN java -Djarmode=layertools -jar target/*.jar extract
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-jammy AS production
+FROM eclipse-temurin:21.0.8_9-jre-jammy AS production
 
 # Create non-root user
 RUN groupadd --gid 1001 appuser && \
