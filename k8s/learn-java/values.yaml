@@ -80,7 +80,8 @@ serviceAccount:
 imagePullSecrets: []
 
 podSecurityContext:
-  fsGroup: 65534
+  # Aligns with the non-root user created in the Docker image (gid: 1001)
+  fsGroup: 1001
 
 securityContext:
   capabilities:
@@ -115,3 +116,9 @@ volumeMounts:
 volumes:
   - name: app-cache
     emptyDir: {}
+
+# Extra environment variables that will be included in the ConfigMap and injected
+# into the container via envFrom. Useful for setting JVM options when root FS is
+# mounted read-only (for example: override java.io.tmpdir to a writable emptyDir)
+extraEnv:
+  JAVA_TOOL_OPTIONS: "-Djava.io.tmpdir=/var/cache/app"

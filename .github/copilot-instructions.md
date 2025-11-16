@@ -29,6 +29,18 @@ This short guide helps an AI coding agent be productive immediately in the learn
 
 # Build Docker
 make docker-build
+
+# Local Kind testing: build, load into Kind, and deploy with Helm
+```bash
+# Build a local test image and tag it appropriately
+docker build -t learn-java:test .
+
+# Load the image into the Kind cluster (required for local Helm installs)
+kind load docker-image learn-java:test --name test-cluster
+
+# Deploy to Kind, forcing Helm to use the local image tag
+helm upgrade --install learn-java ./k8s/learn-java --set image.repository=learn-java --set image.tag=test --set image.pullPolicy=Never --wait --timeout 5m
+```
 ```
 
 4) Patterns & conventions:
@@ -50,6 +62,8 @@ make docker-build
 7) Quick troubleshooting:
 - If checkstyle warnings block CI: run `./mvnw checkstyle:check` and follow messages (javadoc, import order, indentation).
 - If SpotBugs reports EI_EXPOSE_REP, check records returning mutable fields — add defensive copy.
+
+⚠️ When running with `securityContext.readOnlyRootFilesystem=true`, set JVM tmp dir to a writable mount (e.g. `/var/cache/app`) and ensure `podSecurityContext.fsGroup` matches the container uid/gid (e.g., `1001`). Use `JAVA_TOOL_OPTIONS` (`-Djava.io.tmpdir=/var/cache/app`) in the Helm `ConfigMap` or values to avoid Tomcat start errors.
 
 8) Where to ask next:
 - Look at `Makefile` and `README.md` for common developer flows; open a PR referencing `#help-wanted` issues for repo-specific changes.
