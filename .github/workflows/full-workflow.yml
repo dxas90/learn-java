@@ -93,7 +93,7 @@ jobs:
         run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
 
       - name: Run Helm unit tests
-        run: helm unittest k8s/learn-ruby --output-type JUnit --output-file helm-test-results.xml
+        run: helm unittest k8s/learn-java --output-type JUnit --output-file helm-test-results.xml
 
       - name: Publish Helm Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -110,7 +110,7 @@ jobs:
           path: helm-test-results.xml
 
       - name: Lint Helm chart
-        run: helm lint k8s/learn-ruby
+        run: helm lint k8s/learn-java
 
   build:
     name: Build and Scan Docker Image
