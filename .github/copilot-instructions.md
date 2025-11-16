@@ -1,3 +1,60 @@
+# AI Coding Assistant — learn-java (Concise Guide)
+
+This short guide helps an AI coding agent be productive immediately in the learn-java repo.
+
+1) Project snapshot:
+- Java 21, Spring Boot 3.x, embedded Tomcat. Single Jar, layered builds (pom.xml plugin).
+- Minimal REST API: `/`, `/ping`, `/healthz`, `/info` implemented in `HelloController`.
+- Actuator, Prometheus, and OpenAPI (`springdoc`) enabled in `application.yml`.
+
+2) Key locations:
+- `src/main/java/com/learn/springboot/` — controllers, services, DTOs and config.
+- `src/main/java/com/learn/springboot/dto/` — Java 21 records; `ApiResponse<T>` wrapper used across endpoints.
+- `scripts/e2e-test.sh` — Kind + Helm e2e test script used by CI.
+- `k8s/learn-java/` — Helm chart and `values.yaml` toggles (autoscaling, persistence, httproute).
+- `.github/workflows/full-workflow.yml` — CI steps: checkstyle → tests → security scan → helm-test → e2e.
+
+3) Quick commands (copy-paste):
+```bash
+# Build and run locally
+./mvnw clean compile
+./mvnw spring-boot:run
+
+# Tests and coverage
+./mvnw clean test jacoco:report
+
+# Checkers
+./mvnw checkstyle:check
+./mvnw spotbugs:check
+
+# Build Docker
+make docker-build
+```
+
+4) Patterns & conventions:
+- Use Java records for DTOs; for collection fields use defensive copy: `List.copyOf(...)` and return an unmodifiable accessor.
+- Use `ApiResponse<T>` for every JSON endpoint; follow `HelloController` sample.
+- Use `Locale.ROOT` when converting case-sensitive strings for safety.
+- Indentation uses 4 spaces; avoid tabs (Checkstyle enforces style but warnings may be present).
+
+5) CI & testing notes (short):
+- CI uses `./mvnw checkstyle:check` (lint), `./mvnw clean test jacoco:report` (tests), `ossindex-maven-plugin` (vuln scan).
+- Helm unit tests are expected under `k8s/learn-java/tests/`; CI currently references `k8s/learn-ruby` in helm-test job — fix if updating pipeline.
+- E2E uses `scripts/e2e-test.sh` (expects Kind cluster as in `.github/kind-config.yaml`).
+
+6) When editing or adding features:
+- Run `./mvnw clean test` before creating a PR.
+- Add unit tests (`@WebMvcTest` mock service) and integration tests (`@SpringBootTest`) for endpoints.
+- Update `ApiResponse` and `dto/*` records and add defensive copying to avoid EI_EXPOSE_REP issues.
+
+7) Quick troubleshooting:
+- If checkstyle warnings block CI: run `./mvnw checkstyle:check` and follow messages (javadoc, import order, indentation).
+- If SpotBugs reports EI_EXPOSE_REP, check records returning mutable fields — add defensive copy.
+
+8) Where to ask next:
+- Look at `Makefile` and `README.md` for common developer flows; open a PR referencing `#help-wanted` issues for repo-specific changes.
+
+If you'd like, I can expand one section (e.g. testing examples, DTO patterns, or CI fix for helm unittest). Which would you like next?
 # AI Coding Assistant — learn-java (Spring Boot microservice)
 
 This file provides focused guidance for AI coding agents working on the learn-java Spring Boot microservice project.
