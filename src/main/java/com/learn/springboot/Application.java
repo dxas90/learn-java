@@ -17,43 +17,43 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 public class Application {
 
-	private static final Logger logger = LoggerFactory.getLogger(Application.class);
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-	@Value("${spring.application.name:learn-java}")
-	private String applicationName;
+    @Value("${spring.application.name:learn-java}")
+    private String applicationName;
 
-	@Value("${app.version:unknown}")
-	private String applicationVersion;
+    @Value("${app.version:unknown}")
+    private String applicationVersion;
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void onApplicationReady() {
-		logger.info("🚀 Application '{}' version '{}' is ready and running!",
-				applicationName, applicationVersion);
-		logger.info("📊 Actuator endpoints available at /actuator");
-		logger.info("📖 API documentation available at /swagger-ui.html");
-	}
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        logger.info("🚀 Application '{}' version '{}' is ready and running!",
+                applicationName, applicationVersion);
+        logger.info("📊 Actuator endpoints available at /actuator");
+        logger.info("📖 API documentation available at /swagger-ui.html");
+    }
 
-	@Bean
-	@Profile("debug")
-	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-		return args -> {
-			logger.info("🔍 Inspecting Spring Boot beans (debug mode):");
+    @Bean
+    @Profile("debug")
+    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+        return args -> {
+            logger.info("🔍 Inspecting Spring Boot beans (debug mode):");
 
-			String[] beanNames = ctx.getBeanDefinitionNames();
-			Arrays.sort(beanNames);
+            String[] beanNames = ctx.getBeanDefinitionNames();
+            Arrays.sort(beanNames);
 
-			logger.info("📦 Total beans loaded: {}", beanNames.length);
+            logger.info("📦 Total beans loaded: {}", beanNames.length);
 
-			if (logger.isDebugEnabled()) {
-				for (String beanName : beanNames) {
-					logger.debug("Bean: {}", beanName);
-				}
-			}
-		};
-	}
+            if (logger.isDebugEnabled()) {
+                for (String beanName : beanNames) {
+                    logger.debug("Bean: {}", beanName);
+                }
+            }
+        };
+    }
 
 }

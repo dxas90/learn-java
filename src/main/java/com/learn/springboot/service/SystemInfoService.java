@@ -9,6 +9,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.time.Instant;
+import java.util.Locale;
 
 /**
  * Service for gathering system and application information
@@ -69,8 +70,6 @@ public class SystemInfoService {
     }
 
     public SystemInfo.CpuInfo getCpuInfo() {
-        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-
         // These are simplified CPU metrics as Java doesn't provide direct equivalents
         return new SystemInfo.CpuInfo(
                 0L,  // user time (simplified)
@@ -89,7 +88,7 @@ public class SystemInfoService {
         );
 
         SystemInfo.SystemDetails systemDetails = new SystemInfo.SystemDetails(
-                osBean.getName().toLowerCase(),
+                osBean.getName().toLowerCase(Locale.ROOT),
                 osBean.getArch(),
                 System.getProperty("java.version"),
                 getUptime(),

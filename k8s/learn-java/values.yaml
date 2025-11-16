@@ -1,0 +1,117 @@
+replicaCount: 1
+
+image:
+  repository: "dxas90/learn-java"
+  pullPolicy: "IfNotPresent"
+  tag: "latest"
+
+service:
+  type: "ClusterIP"
+  port: 8080
+  annotations: {}
+
+chart_label: "learn-java"
+
+namespace: "default"
+
+httproute:
+  enabled: False
+  gatewayName: "gateway"
+  gatewayNamespace: "gateway-system"
+  sectionName: "http"
+  annotations: {}
+    # external-dns.alpha.kubernetes.io/target: "gateway.example.com"
+  labels: {}
+    # use-cloudflare-solver: "true"
+  hostnames:
+    - "example.local"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - port: 8080
+
+persistence:
+  enabled: False
+  capacity: "8Mi"
+  mountPath: "/data"
+
+autoscaling:
+  enabled: False
+  minReplicas: 1
+  maxReplicas: 10
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+chart:
+  label: "learn-java"
+
+# Environment configuration
+env:
+  # Environment variables from file will be loaded here during chart generation
+  # if env_file_path is provided in cookiecutter.json
+  variables: {}
+
+# Common secret and settings references
+common:
+  secrets:
+    enabled: False
+    name: "common-secrets"
+  settings:
+    enabled: False
+    name: "common-settings"
+
+# Other values from the original chart are intentionally left as defaults.
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Added to the deployment spec template
+imagePullSecrets: []
+
+podSecurityContext:
+  fsGroup: 65534
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  failureThreshold: 3
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  failureThreshold: 3
+  timeoutSeconds: 5
+
+volumeMounts:
+  - name: app-cache
+    mountPath: /var/cache/app
+
+volumes:
+  - name: app-cache
+    emptyDir: {}

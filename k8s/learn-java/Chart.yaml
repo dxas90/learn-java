@@ -1,0 +1,8 @@
+apiVersion: v2
+name: "learn-java"
+description: "Helm chart for learning java"
+type: application
+version: "0.1.0"
+appVersion: "v0.0.12"
+maintainers:
+  - name: "Daniel Ramirez <dxas90@gmail.com>"
