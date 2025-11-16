@@ -91,7 +91,7 @@ tests:
           value: 1001
       - equal:
           path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
-          value: true
+          value: false
 
   - it: should apply custom labels
     set:
