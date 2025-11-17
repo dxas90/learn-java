@@ -52,8 +52,8 @@ spring:
 
 logging:
   level:
-    com.learn.springboot: DEBUG
-    web: DEBUG
+    com.learn.springboot: INFO
+    web: INFO
 
 ---
 spring:

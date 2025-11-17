@@ -69,7 +69,7 @@ public class HelloController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Pong response received")
     })
     public ResponseEntity<String> ping() {
-        logger.debug("Ping endpoint accessed");
+        logger.info("Ping endpoint accessed");
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body("pong");
@@ -81,7 +81,7 @@ public class HelloController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Application is healthy")
     })
     public ResponseEntity<com.learn.springboot.dto.ApiResponse<HealthData>> healthz() {
-        logger.debug("Health endpoint accessed");
+        logger.info("Health endpoint accessed");
 
         HealthData healthData = systemInfoService.getHealthData();
         com.learn.springboot.dto.ApiResponse<HealthData> response = com.learn.springboot.dto.ApiResponse.success(healthData);
@@ -95,7 +95,7 @@ public class HelloController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully retrieved application information")
     })
     public ResponseEntity<com.learn.springboot.dto.ApiResponse<SystemInfo>> info() {
-        logger.debug("Info endpoint accessed");
+        logger.info("Info endpoint accessed");
 
         SystemInfo systemInfo = systemInfoService.getSystemInfo();
         com.learn.springboot.dto.ApiResponse<SystemInfo> response = com.learn.springboot.dto.ApiResponse.success(systemInfo);
