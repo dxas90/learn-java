@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: "dxas90/learn-java"
-  pullPolicy: "IfNotPresent"
+  pullPolicy: "Always"
   tag: "latest"
 
 service:
