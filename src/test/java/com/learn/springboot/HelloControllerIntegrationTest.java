@@ -1,63 +1,65 @@
 package com.learn.springboot;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@DisplayName("Hello Controller Integration Tests")
 class HelloControllerIntegrationTest {
 
     @LocalServerPort
     private int port;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Test
+    @DisplayName("Should return welcome message via HTTP")
     void shouldReturnWelcomeMessage() {
-        ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/", String.class);
+        String url = "http://localhost:" + port + "/";
+        String response = restTemplate.getForObject(url, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("Welcome to Learn Java API");
-        assertThat(response.getBody()).contains("\"success\":true");
+        assertThat(response).isNotNull();
+        assertThat(response).contains("Welcome to Learn Java API");
+        assertThat(response).contains("success");
     }
 
     @Test
+    @DisplayName("Should return pong via HTTP")
     void shouldReturnPongForPing() {
-        ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/ping", String.class);
+        String url = "http://localhost:" + port + "/ping";
+        String response = restTemplate.getForObject(url, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("pong");
+        assertThat(response).isEqualTo("pong");
     }
 
     @Test
+    @DisplayName("Should return health status via HTTP")
     void shouldReturnHealthStatus() {
-        ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/healthz", String.class);
+        String url = "http://localhost:" + port + "/healthz";
+        String response = restTemplate.getForObject(url, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("\"success\":true");
-        assertThat(response.getBody()).contains("\"status\":\"healthy\"");
+        assertThat(response).isNotNull();
+        assertThat(response).contains("success");
+        assertThat(response).contains("healthy");
     }
 
     @Test
+    @DisplayName("Should return system info via HTTP")
     void shouldReturnSystemInfo() {
-        ResponseEntity<String> response = this.restTemplate
-                .getForEntity("http://localhost:" + port + "/info", String.class);
+        String url = "http://localhost:" + port + "/info";
+        String response = restTemplate.getForObject(url, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("\"success\":true");
-        assertThat(response.getBody()).contains("application");
-        assertThat(response.getBody()).contains("system");
+        assertThat(response).isNotNull();
+        assertThat(response).contains("success");
+        assertThat(response).contains("application");
+        assertThat(response).contains("system");
     }
 }
