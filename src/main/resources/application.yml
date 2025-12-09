@@ -26,10 +26,29 @@ management:
       enabled: true
   tracing:
     sampling:
-      probability: 1.0
+      # Set to 0.0 by default to disable tracing when OTEL is not configured
+      # Override with OTEL_SAMPLING_PROBABILITY=1.0 when OTEL endpoint is available
+      probability: ${OTEL_SAMPLING_PROBABILITY:0.0}
   otlp:
     tracing:
+      # Only used when sampling probability > 0
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://tempo.observability.svc.cluster.local:4318}
+    metrics:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://tempo.observability.svc.cluster.local:4318}
+    logs:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://tempo.observability.svc.cluster.local:4318}
+
+# OpenTelemetry configuration - disable by default, enable via environment variables
+otel:
+  exporter:
+    otlp:
+      enabled: ${OTEL_EXPORTER_ENABLED:false}
+  logs:
+    exporter: ${OTEL_LOGS_EXPORTER:none}
+  metrics:
+    exporter: ${OTEL_METRICS_EXPORTER:none}
+  traces:
+    exporter: ${OTEL_TRACES_EXPORTER:none}
 
 logging:
   level:

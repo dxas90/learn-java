@@ -68,6 +68,11 @@ env:
 extraEnv:
   JAVA_TOOL_OPTIONS: "-Djava.io.tmpdir=/var/cache/app"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.observability.svc.cluster.local:4318"
+  OTEL_SAMPLING_PROBABILITY: "1.0"  # Enable tracing when OTEL endpoint is configured
+  OTEL_EXPORTER_ENABLED: "true"     # Enable OTLP exporter
+  OTEL_LOGS_EXPORTER: "otlp"        # Export logs via OTLP
+  OTEL_METRICS_EXPORTER: "otlp"     # Export metrics via OTLP
+  OTEL_TRACES_EXPORTER: "otlp"      # Export traces via OTLP
 # Common secret and settings references
 common:
   secrets:

@@ -175,6 +175,12 @@ The application exposes several monitoring endpoints:
 | `DATABASE_URL` | Database connection URL | `jdbc:h2:mem:devdb` |
 | `DATABASE_USERNAME` | Database username | `sa` |
 | `DATABASE_PASSWORD` | Database password | `password` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OpenTelemetry collector endpoint | `http://tempo.observability.svc.cluster.local:4318` |
+| `OTEL_SAMPLING_PROBABILITY` | Tracing sampling rate (0.0-1.0, 0=disabled) | `0.0` |
+| `OTEL_EXPORTER_ENABLED` | Enable OTLP exporter | `false` |
+| `OTEL_LOGS_EXPORTER` | Logs exporter type (none/otlp) | `none` |
+| `OTEL_METRICS_EXPORTER` | Metrics exporter type (none/otlp) | `none` |
+| `OTEL_TRACES_EXPORTER` | Traces exporter type (none/otlp) | `none` |
 
 ## 🚀 CI/CD Pipeline
 
