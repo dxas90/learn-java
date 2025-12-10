@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9.11-eclipse-temurin-21 AS builder
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /build
 
@@ -18,19 +18,18 @@ RUN mvn clean package -DskipTests -B
 # Extract layers for better Docker layer caching
 RUN java -Djarmode=layertools -jar target/*.jar extract
 
-# Runtime stage
-FROM eclipse-temurin:25.0.1_8-jre-jammy AS production
+# Runtime stage - Alpine JRE for minimal size
+FROM eclipse-temurin:21-jre-alpine AS production
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    tzdata \
+    ca-certificates
 
 # Create non-root user
-RUN groupadd --gid 1001 appuser && \
-    useradd --uid 1001 --gid 1001 --create-home --shell /bin/bash appuser
-
-# Install security updates and curl for health checks, then clean up
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN addgroup -g 1001 appuser && \
+    adduser -D -u 1001 -G appuser appuser
 
 # Set up application directory
 WORKDIR /app
