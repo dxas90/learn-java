@@ -19,7 +19,7 @@ RUN mvn clean package -DskipTests -B
 RUN java -Djarmode=layertools -jar target/*.jar extract
 
 # Runtime stage - Alpine JRE for minimal size
-FROM eclipse-temurin:21-jre-alpine AS production
+FROM eclipse-temurin:21.0.9_10-jre-alpine AS production
 
 # Install runtime dependencies
 RUN apk add --no-cache \
